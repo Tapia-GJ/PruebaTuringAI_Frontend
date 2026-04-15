@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, Navigate } from 'react-router-dom';
 import { Input } from '../../components/common/Input';
 import { Button } from '../../components/common/Button';
 import { useAuth } from '../../hooks/useAuth';
 
 export const Register = () => {
   const navigate = useNavigate();
-  const { register, isLoading, error: authError } = useAuth();
+  const { register, isLoading, error: authError, user } = useAuth();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -77,6 +77,9 @@ export const Register = () => {
   useEffect(() => {
     setErrors({});
   }, []);
+  if (user) {
+    return <Navigate to={user.roleId === 2 ? '/admin' : '/catalog'} replace />;
+  }
 
   const submitError = errors.submit || authError;
   const isButtonDisabled = isSubmitting || isLoading;

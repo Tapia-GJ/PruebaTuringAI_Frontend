@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { Input } from '../../components/common/Input';
 import { Button } from '../../components/common/Button';
 import { useAuth } from '../../hooks/useAuth';
-import type { User } from '../../types/auth.types';
+
 export const Login = () => {
-  const navigate = useNavigate();
-  const { login, isLoading, error: authError } = useAuth();
+  const { login, isLoading, error: authError, user } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -44,12 +43,7 @@ export const Login = () => {
     setIsSubmitting(true);
 
     try {
-      const user = await login(email, password);
-      if (user?.role === 'ADMIN') {
-        navigate('/admin');
-      } else {
-        navigate('/catalog');
-      }
+      await login(email, password);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al iniciar sesión';
       setErrors({ submit: errorMessage });
@@ -61,6 +55,9 @@ export const Login = () => {
   useEffect(() => {
     setErrors({});
   }, []);
+  if (user) {
+    return <Navigate to={user.roleId === 2 ? '/admin' : '/catalog'} replace />;
+  }
 
   const submitError = errors.submit || authError;
   const isButtonDisabled = isSubmitting || isLoading;

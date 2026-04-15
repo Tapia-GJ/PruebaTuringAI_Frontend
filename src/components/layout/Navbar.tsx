@@ -47,7 +47,7 @@ export const Navbar = () => {
             <Link to="/favorites" className="text-slate-300 hover:text-white transition-colors">
               Favoritos
             </Link>
-            {user.role === 'ADMIN' && (
+            {user.roleId === 2 && (
               <Link to="/admin" className="text-cyan-400 hover:text-cyan-300 transition-colors">
                 Panel Admin
               </Link>
