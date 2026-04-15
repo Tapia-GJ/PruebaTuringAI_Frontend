@@ -1,32 +1,32 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, SlidersHorizontal, X } from 'lucide-react';
 import { ComicCard } from '../../components/ui/ComicCard';
-
-// Dummy data
-const DUMMY_COMICS = [
-  { id: 1, title: 'Cyber City Chronicles', author: 'Aris Thorne', genres: ['Sci-Fi', 'Noir'], isNew: true, coverUrl: 'https://marmota.me/wp-content/uploads/2024/12/Justice-League-Unlimited-001digital-Marika-Empire-000-scaled.jpg' },
-  { id: 2, title: 'The Neon Soul', author: 'Elena Vance', genres: ['Drama', 'Tech'], coverUrl: 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=400&auto=format&fit=crop' },
-  { id: 3, title: 'Void Runners', author: 'Marcus Jin', genres: ['Space Opera', 'Acción'], coverUrl: 'https://images.unsplash.com/photo-1618336753974-aae8e04506aa?q=80&w=400&auto=format&fit=crop' },
-  { id: 4, title: 'Silicon Dreams', author: 'Lora K.', genres: ['Cyberpunk', 'Filosofía'], coverUrl: 'https://images.unsplash.com/photo-1535295972055-1c762f4483e5?q=80&w=400&auto=format&fit=crop' },
-  { id: 5, title: 'Akira', author: 'Katsuhiro Otomo', genres: ['Cyberpunk', 'Acción'], coverUrl: 'https://images.unsplash.com/photo-1605806616949-1e87b487cb2a?q=80&w=400&auto=format&fit=crop' },
-  { id: 6, title: 'Ghost in the Shell', author: 'Masamune Shirow', genres: ['Sci-Fi', 'Cyberpunk'], coverUrl: 'https://images.unsplash.com/photo-1558865869-c93f6f8482af?q=80&w=400&auto=format&fit=crop' },
-];
-
-const FILTER_CATEGORIES = [
-  {
-    name: 'Géneros',
-    options: ['Sci-Fi', 'Cyberpunk', 'Noir', 'Acción', 'Drama', 'Space Opera', 'Filosofía', 'Fantasía']
-  },
-  {
-    name: 'Estado',
-    options: ['En Emisión', 'Finalizado', 'Pausado']
-  }
-];
+import { getWorks } from '../../api/works.api';
+import type { Work } from '../../types/work.types';
+import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 
 export const Catalog = () => {
+  const [works, setWorks] = useState<Work[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchWorks = async () => {
+      try {
+        const data = await getWorks();
+        setWorks(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Error desconocido al cargar el catálogo');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchWorks();
+  }, []);
 
   const toggleFilter = (filter: string) => {
     setActiveFilters(prev =>
@@ -36,15 +36,54 @@ export const Catalog = () => {
     );
   };
 
-  const filteredComics = DUMMY_COMICS.filter(comic => {
-    const matchesSearch = comic.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      comic.author.toLowerCase().includes(searchQuery.toLowerCase());
+  // Extraer géneros dinámicos basados en la BD
+  const availableGenres = Array.from(new Set(works.flatMap(w => w.workGenres.map(wg => wg.genre.name))));
+  
+  const FILTER_CATEGORIES = [
+    {
+      name: 'Géneros',
+      options: availableGenres.length > 0 ? availableGenres : ['Sci-Fi', 'Cyberpunk', 'Fantasía', 'Acción'] // fallback
+    }
+  ];
 
+  const filteredComics = works.filter(work => {
+    const matchesSearch = work.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      work.author.name.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const workGenreNames = work.workGenres.map(wg => wg.genre.name);
     const matchesFilters = activeFilters.length === 0 ||
-      activeFilters.some(filter => comic.genres.includes(filter));
+      activeFilters.some(filter => workGenreNames.includes(filter));
 
     return matchesSearch && matchesFilters;
   });
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen pt-24 pb-12 relative flex flex-col w-full items-center justify-center">
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-size-[14px_24px] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
+          <div className="absolute left-1/2 top-[-10%] h-250 w-250 -translate-x-1/2 rounded-full bg-[radial-gradient(circle_400px_at_50%_300px,rgba(34,211,238,0.12),transparent)]"></div>
+        </div>
+        <div className="relative z-10">
+          <LoadingSpinner />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen pt-24 pb-12 relative flex flex-col w-full items-center justify-center">
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-size-[14px_24px] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
+          <div className="absolute left-1/2 top-[-10%] h-250 w-250 -translate-x-1/2 rounded-full bg-[radial-gradient(circle_400px_at_50%_300px,rgba(34,211,238,0.12),transparent)]"></div>
+        </div>
+        <div className="relative z-10 text-center">
+          <p className="text-red-500 font-bold">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pt-24 pb-12 relative flex flex-col w-full">
@@ -151,7 +190,14 @@ export const Catalog = () => {
         {filteredComics.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
             {filteredComics.map(comic => (
-              <ComicCard key={comic.id} {...comic} />
+              <ComicCard
+                key={comic.id}
+                id={comic.id}
+                title={comic.title}
+                author={comic.author.name}
+                coverUrl={comic.coverUrl || ''}
+                genres={comic.workGenres.map(wg => wg.genre.name)}
+              />
             ))}
           </div>
         ) : (
