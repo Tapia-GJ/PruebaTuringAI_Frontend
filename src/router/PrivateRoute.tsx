@@ -1,9 +1,34 @@
 import type { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
-export const PrivateRoute = ({ children, role }: { children: ReactNode; role?: string }) => {
-    const isAuthenticated = true;
-    const userRole = 'ADMIN';
-    if (!isAuthenticated) return <Navigate to='/login' replace />;
-    if (role && userRole !== role) return <Navigate to='/' replace />;
-    return <>{children}</>
+import { useAuth } from '../hooks/useAuth';
+import { LoadingSpinner } from '../components/common/LoadingSpinner';
+
+interface PrivateRouteProps {
+  children: ReactNode;
+  role?: string;
+}
+export const PrivateRoute = ({ children, role }: PrivateRouteProps) => {
+  const { isAuthenticated, isLoading, user } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  if (role && user) {
+    const userRole = user.roleId === 2 ? 'ADMIN' : 'USER';
+
+    if (userRole !== role) {
+      return <Navigate to="/" replace />;
+    }
+  }
+
+  return <>{children}</>;
 };
+
