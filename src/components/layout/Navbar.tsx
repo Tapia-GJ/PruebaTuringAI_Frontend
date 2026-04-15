@@ -1,9 +1,17 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { Button } from '../common/Button';
+import { useAuth } from '../../hooks/useAuth';
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -31,18 +39,33 @@ export const Navbar = () => {
       </Link>
 
       <div className="flex gap-6 items-center text-sm font-medium">
-        <Link to="/login" className="text-slate-300 hover:text-white transition-colors">
-          Iniciar sesión
-        </Link>
-        <Button to="/register" variant="primary" className='font-semibold'>
-          Registrarse
-        </Button>
-        {/* <Link
-          to="/register"
-          className="bg-cyan-400 text-slate-950 px-5 py-2 rounded-xl font-bold hover:bg-cyan-300 transition-colors shadow-[0_0_15px_rgba(34,211,238,0.3)]"
-        >
-          Registrarse
-        </Link> */}
+        {user ? (
+          <>
+            <Link to="/catalog" className="text-slate-300 hover:text-white transition-colors">
+              Catálogo
+            </Link>
+            <Link to="/favorites" className="text-slate-300 hover:text-white transition-colors">
+              Favoritos
+            </Link>
+            {user.role === 'ADMIN' && (
+              <Link to="/admin" className="text-cyan-400 hover:text-cyan-300 transition-colors">
+                Panel Admin
+              </Link>
+            )}
+            <button onClick={handleLogout} className="text-red-400 hover:text-red-300 transition-colors font-semibold">
+              Cerrar sesión
+            </button>
+          </>
+        ) : (
+          <>
+            <Link to="/login" className="text-slate-300 hover:text-white transition-colors">
+              Iniciar sesión
+            </Link>
+            <Button to="/register" variant="primary" className='font-semibold'>
+              Registrarse
+            </Button>
+          </>
+        )}
       </div>
     </nav>
   );

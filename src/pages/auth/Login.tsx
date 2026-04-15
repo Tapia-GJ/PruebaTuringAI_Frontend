@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Input } from '../../components/common/Input';
 import { Button } from '../../components/common/Button';
 import { useAuth } from '../../hooks/useAuth';
-
+import type { User } from '../../types/auth.types';
 export const Login = () => {
   const navigate = useNavigate();
   const { login, isLoading, error: authError } = useAuth();
@@ -44,8 +44,12 @@ export const Login = () => {
     setIsSubmitting(true);
 
     try {
-      await login(email, password);
-      navigate('/admin');
+      const user = await login(email, password);
+      if (user?.role === 'ADMIN') {
+        navigate('/admin');
+      } else {
+        navigate('/catalog');
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error al iniciar sesión';
       setErrors({ submit: errorMessage });
