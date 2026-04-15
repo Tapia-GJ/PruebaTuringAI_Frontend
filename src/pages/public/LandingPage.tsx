@@ -142,15 +142,15 @@ export const LandingPage = () => {
             </h1>
 
             <p className="hero-desc text-lg text-slate-300 max-w-md leading-relaxed">
-              Explora una biblioteca curada de narrativas visuales impulsadas por inteligencia artificial y creatividad humana sin límites.
+              Explora una biblioteca de narrativas visuales impulsadas por creatividad humana sin límites.
             </p>
 
             <div className="flex flex-wrap gap-4 mt-4">
-              <Button to="/catalog" variant="primary" className="hero-cta font-semibold">
+              <Button to="/login" variant="primary" className="hero-cta font-semibold">
                 Explorar cómics
               </Button>
               <Button to="/register" variant="secondary" className="hero-cta">
-                Ver Demo
+                Registrate
               </Button>
             </div>
           </div>
