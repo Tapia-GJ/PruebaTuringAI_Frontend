@@ -29,19 +29,19 @@ export const Catalog = () => {
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
 
   const toggleFilter = (filter: string) => {
-    setActiveFilters(prev => 
-      prev.includes(filter) 
+    setActiveFilters(prev =>
+      prev.includes(filter)
         ? prev.filter(f => f !== filter)
         : [...prev, filter]
     );
   };
 
   const filteredComics = DUMMY_COMICS.filter(comic => {
-    const matchesSearch = comic.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          comic.author.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesFilters = activeFilters.length === 0 || 
-                           activeFilters.some(filter => comic.genres.includes(filter));
+    const matchesSearch = comic.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      comic.author.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesFilters = activeFilters.length === 0 ||
+      activeFilters.some(filter => comic.genres.includes(filter));
 
     return matchesSearch && matchesFilters;
   });
@@ -49,7 +49,7 @@ export const Catalog = () => {
   return (
     <div className="min-h-screen bg-[#060b13] pt-24 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-8">
-        
+
         {/* Header Section */}
         <div className="flex flex-col gap-6 mb-10">
           <div>
@@ -71,14 +71,13 @@ export const Catalog = () => {
                 className="block w-full pl-11 pr-4 py-3 bg-slate-900/50 border border-slate-800 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 transition-all"
               />
             </div>
-            
+
             <button
               onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl border transition-all font-semibold ${
-                isFilterOpen || activeFilters.length > 0
-                  ? 'bg-cyan-500/10 border-cyan-500/50 text-cyan-400'
-                  : 'bg-slate-900/50 border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white'
-              }`}
+              className={`flex items-center justify-center gap-2 px-6 py-3 rounded-xl border transition-all font-semibold ${isFilterOpen || activeFilters.length > 0
+                ? 'bg-cyan-500/10 border-cyan-500/50 text-cyan-400'
+                : 'bg-slate-900/50 border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white'
+                }`}
             >
               <SlidersHorizontal className="w-5 h-5" />
               <span>Filtros</span>
@@ -92,10 +91,9 @@ export const Catalog = () => {
         </div>
 
         {/* Expandable Filter Section */}
-        <div 
-          className={`overflow-hidden transition-all duration-300 ease-in-out ${
-            isFilterOpen ? 'max-h-[800px] opacity-100 mb-10' : 'max-h-0 opacity-0 mb-0'
-          }`}
+        <div
+          className={`overflow-hidden transition-all duration-300 ease-in-out ${isFilterOpen ? 'max-h-200 opacity-100 mb-10' : 'max-h-0 opacity-0 mb-0'
+            }`}
         >
           <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-6 lg:p-8">
             <div className="flex justify-between items-center mb-6">
@@ -104,7 +102,7 @@ export const Catalog = () => {
                 Filtros Avanzados
               </h3>
               {activeFilters.length > 0 && (
-                <button 
+                <button
                   onClick={() => setActiveFilters([])}
                   className="text-sm text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-1 font-medium"
                 >
@@ -118,7 +116,7 @@ export const Catalog = () => {
                 <div key={category.name}>
                   <h4 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
                     {category.name}
-                    <div className="h-[1px] flex-1 bg-slate-800/50"></div>
+                    <div className="h-px flex-1 bg-slate-800/50"></div>
                   </h4>
                   <div className="flex flex-wrap gap-2.5">
                     {category.options.map(option => {
@@ -127,11 +125,10 @@ export const Catalog = () => {
                         <button
                           key={option}
                           onClick={() => toggleFilter(option)}
-                          className={`border rounded-lg text-[10px] sm:text-xs font-bold uppercase tracking-widest px-3 py-1.5 transition-all duration-200 ${
-                            isSelected
-                              ? 'border-cyan-400 bg-cyan-400/10 text-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.15)]'
-                              : 'border-slate-700/50 bg-slate-800/30 text-slate-400 hover:border-cyan-400/50 hover:text-cyan-300 hover:bg-slate-800'
-                          }`}
+                          className={`border rounded-lg text-[10px] sm:text-xs font-bold uppercase tracking-widest px-3 py-1.5 transition-all duration-200 ${isSelected
+                            ? 'border-cyan-400 bg-cyan-400/10 text-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.15)]'
+                            : 'border-slate-700/50 bg-slate-800/30 text-slate-400 hover:border-cyan-400/50 hover:text-cyan-300 hover:bg-slate-800'
+                            }`}
                         >
                           {option}
                         </button>
@@ -161,7 +158,7 @@ export const Catalog = () => {
               Intenta buscar con otros términos o elimina algunos filtros para ver más resultados.
             </p>
             {activeFilters.length > 0 && (
-              <button 
+              <button
                 onClick={() => setActiveFilters([])}
                 className="mt-6 px-6 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg transition-colors font-medium text-sm"
               >

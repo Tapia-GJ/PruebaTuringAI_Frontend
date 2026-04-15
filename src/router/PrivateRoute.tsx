@@ -24,7 +24,7 @@ export const PrivateRoute = ({ children, role }: PrivateRouteProps) => {
   if (role && user) {
     const userRole = user.roleId === 2 ? 'ADMIN' : 'USER';
 
-    if (userRole !== role) {
+    if (role === 'ADMIN' && userRole !== 'ADMIN') {
       return <Navigate to="/" replace />;
     }
   }

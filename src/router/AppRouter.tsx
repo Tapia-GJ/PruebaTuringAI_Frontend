@@ -4,7 +4,7 @@ import { AuthLayout } from '../layouts/AuthLayout';
 import { AdminLayout } from '../layouts/AdminLayout';
 
 import { LandingPage } from '../pages/public/LandingPage';
-import { WorkDetail } from '../pages/public/WorkDetail';
+import { WorkDetail } from '../pages/reader/WorkDetail';
 import { Login } from '../pages/auth/Login';
 import { Register } from '../pages/auth/Register';
 import { Catalog } from '../pages/reader/Catalog';
@@ -22,10 +22,18 @@ export const AppRouter = () => {
       {/* Rutas Públicas - Main Layout */}
       <Route element={<MainLayout />}>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/catalog" element={<Catalog />} />
-        <Route path="/works/:id" element={<WorkDetail />} />
-        
-        {/* Rutas Protegidas de Lector (Ej. Favoritos) */}
+
+        {/* Rutas Protegidas de Lector (USER o ADMIN) */}
+        <Route path="/catalog" element={
+          <PrivateRoute role="USER">
+            <Catalog />
+          </PrivateRoute>
+        } />
+        <Route path="/works/:id" element={
+          <PrivateRoute role="USER">
+            <WorkDetail />
+          </PrivateRoute>
+        } />
         <Route path="/favorites" element={
           <PrivateRoute role="USER">
             <Favorites />
@@ -50,7 +58,7 @@ export const AppRouter = () => {
         <Route path="authors" element={<AuthorsList />} />
         <Route path="genres" element={<GenresList />} />
       </Route>
-      
+
       {/* 404 Catch-all */}
       <Route path="*" element={<h1>404 - Not Found</h1>} />
     </Routes>

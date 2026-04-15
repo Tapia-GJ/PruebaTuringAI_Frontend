@@ -146,7 +146,7 @@ export const LandingPage = () => {
             </p>
 
             <div className="flex flex-wrap gap-4 mt-4">
-              <Button to="/login" variant="primary" className="hero-cta font-semibold">
+              <Button to="/catalog" variant="primary" className="hero-cta font-semibold">
                 Explorar cómics
               </Button>
               <Button to="/register" variant="secondary" className="hero-cta">
