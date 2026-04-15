@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { MainLayout } from '../layouts/MainLayout';
 import { AuthLayout } from '../layouts/AuthLayout';
 import { AdminLayout } from '../layouts/AdminLayout';
@@ -10,7 +10,6 @@ import { Register } from '../pages/auth/Register';
 import { Catalog } from '../pages/reader/Catalog';
 import { Favorites } from '../pages/reader/Favorites';
 
-import { Dashboard } from '../pages/admin/Dashboard';
 import { WorksList } from '../pages/admin/works/WorksList';
 import { AuthorsList } from '../pages/admin/authors/AuthorsList';
 import { GenresList } from '../pages/admin/genres/GenresList';
@@ -53,7 +52,7 @@ export const AppRouter = () => {
           <AdminLayout />
         </PrivateRoute>
       }>
-        <Route index element={<Dashboard />} />
+        <Route index element={<Navigate to="works" replace />} />
         <Route path="works" element={<WorksList />} />
         <Route path="authors" element={<AuthorsList />} />
         <Route path="genres" element={<GenresList />} />
