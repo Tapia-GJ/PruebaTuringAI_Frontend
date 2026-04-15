@@ -1,1 +1,9 @@
-import { ReactNode } from 'react';\nimport { Navigate } from 'react-router-dom';\n\nexport const PrivateRoute = ({ children, role }: { children: ReactNode; role?: string }) => {\n  const isAuthenticated = true; // TODO: Implement real auth check\n  const userRole = 'ADMIN'; // TODO: Get from auth context\n\n  if (!isAuthenticated) return <Navigate to='/login' replace />;\n  if (role && userRole !== role) return <Navigate to='/' replace />;\n\n  return <>{children}</>;\n};
+import type { ReactNode } from 'react';
+import { Navigate } from 'react-router-dom';
+export const PrivateRoute = ({ children, role }: { children: ReactNode; role?: string }) => {
+    const isAuthenticated = true;
+    const userRole = 'ADMIN';
+    if (!isAuthenticated) return <Navigate to='/login' replace />;
+    if (role && userRole !== role) return <Navigate to='/' replace />;
+    return <>{children}</>
+};
