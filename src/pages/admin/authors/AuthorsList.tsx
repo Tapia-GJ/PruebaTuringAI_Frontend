@@ -1,4 +1,23 @@
+import { Table, type Column } from "../../../components/ui/Table";
+import React from 'react';
+
+// Tipado basado en el modelo Prisma
+interface Author {
+  id: number;
+  name: string;
+}
 export const AuthorsList = () => {
+
+  const [authors, setAuthors] = React.useState<Author[]>([
+    { id: 1, name: 'Gabriel García Márquez' },
+    { id: 2, name: 'Isabel Allende' }
+  ]);
+
+  const columns: Column<Author>[] = [
+    { key: 'id', header: 'ID' },
+    { key: 'name', header: 'Nombre del Autor' }
+  ];
+
   return (
     <div className="space-y-6">
       <div>
@@ -6,13 +25,12 @@ export const AuthorsList = () => {
         <p className="text-slate-400">Administra los autores del catálogo</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 mt-8">
-        <div className="bg-slate-950 border border-slate-800/50 rounded-lg p-8 text-center">
-          <p className="text-slate-500 text-lg">
-            Aquí irá la tabla de autores con opciones para crear, editar y eliminar.
-          </p>
-        </div>
-      </div>
+      <Table<Author>
+        data={authors}
+        columns={columns}
+        onEdit={(author) => console.log('Editando', author)}
+        onDelete={(author) => console.log('Eliminando', author)}
+      />
     </div>
   );
 };
