@@ -93,7 +93,7 @@ export const Catalog = () => {
         <div className="absolute left-1/2 top-[-10%] h-250 w-250 -translate-x-1/2 rounded-full bg-[radial-gradient(circle_400px_at_50%_300px,rgba(34,211,238,0.12),transparent)]"></div>
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-8">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-8">
 
         {/* Header Section */}
         <div className="flex flex-col gap-6 mb-10">

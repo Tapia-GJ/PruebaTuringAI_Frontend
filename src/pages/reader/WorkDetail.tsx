@@ -115,7 +115,7 @@ export const WorkDetail = () => {
                         <div className="absolute left-1/2 top-1/4 -translate-x-1/2 w-200 h-100 bg-cyan-500/10 blur-[120px] rounded-full mix-blend-screen" />
                     </div>
 
-                    <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-8 pt-32 lg:pt-40">
+                    <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-8 pt-32 lg:pt-40">
 
                         <nav className="work-meta-item flex items-center gap-2 text-xs font-semibold tracking-widest uppercase text-slate-500 mb-8">
                             <Link to="/" className="hover:text-cyan-400 transition-colors">Inicio</Link>
