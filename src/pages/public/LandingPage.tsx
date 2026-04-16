@@ -1,24 +1,40 @@
-import { Link } from 'react-router-dom';
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
-import { ComicCard } from '../../components/ui/ComicCard';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Button } from '../../components/common/Button';
+import { getLatestWorks } from '../../api/works.api';
+import type { Work } from '../../types/work.types';
 
-// Registrar el plugin para React (buena práctica recomendada por tu skill)
-gsap.registerPlugin(useGSAP);
+// Registrar el plugin para React y ScrollTrigger
+gsap.registerPlugin(useGSAP, ScrollTrigger);
 
-// Dummy data basado en tu mockup
-const NOVEDADES = [
-  { id: 1, title: 'Cyber City Chronicles', author: 'Aris Thorne', genres: ['Sci-Fi', 'Noir'], isNew: true, coverUrl: 'https://marmota.me/wp-content/uploads/2024/12/Justice-League-Unlimited-001digital-Marika-Empire-000-scaled.jpg' },
-  { id: 2, title: 'The Neon Soul', author: 'Elena Vance', genres: ['Drama', 'Tech'], coverUrl: 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=400&auto=format&fit=crop' },
-  { id: 3, title: 'Void Runners', author: 'Marcus Jin', genres: ['Space Opera', 'Acción'], coverUrl: 'https://images.unsplash.com/photo-1618336753974-aae8e04506aa?q=80&w=400&auto=format&fit=crop' },
-  { id: 4, title: 'Silicon Dreams', author: 'Lora K.', genres: ['Cyberpunk', 'Filosofía'], coverUrl: 'https://images.unsplash.com/photo-1535295972055-1c762f4483e5?q=80&w=400&auto=format&fit=crop' },
-];
+// Fallback image if cover is not available
+const FALLBACK_IMAGE = 'https://marmota.me/wp-content/uploads/2022/06/Nightwing-078-001.jpg';
 
 export const LandingPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const posterRef = useRef<HTMLDivElement>(null);
+  const [accordionWorks, setAccordionWorks] = useState<Work[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLatestWorks = async () => {
+      try {
+        setIsLoading(true);
+        const works = await getLatestWorks();
+        setAccordionWorks(works);
+      } catch (error) {
+        console.error('Error fetching latest works:', error);
+        // Keep the loading state hidden on error - don't show accordion
+        setAccordionWorks([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchLatestWorks();
+  }, []);
 
   useGSAP((_context, contextSafe) => {
     // Definimos el timeline para encadenar animaciones limpiamente
@@ -68,6 +84,35 @@ export const LandingPage = () => {
       ease: "power4.out"
     }, "-=1.5");
 
+    // --- ANIMACIONES ON SCROLL ---
+
+    // Animación de letras subiendo para Novedades
+    const scrollTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: ".novedades-section",
+        start: "top 60%", // Cuando el top de la sección llega al 80% de la ventana
+        toggleActions: "play none none none",
+        once: true
+      }
+    });
+
+    scrollTl.from(".novedades-char", {
+      y: 30,
+      opacity: 0,
+      duration: 0.5,
+      stagger: 0.01, // Stagger entre cada letra
+      ease: "back.out(1.5)"
+    }).from(".novedades-heading", {
+      y: 20,
+      opacity: 0,
+      duration: 0.8,
+      ease: "power3.out"
+    }, "-=0.3").fromTo(".accordion-item",
+      { y: 40, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.6, stagger: 0.15, ease: "power2.out", clearProps: "transform" },
+      "-=0.5"
+    );
+
     // --- INTERACCIÓN CON EL MOUSE ---
 
     // Usamos gsap.quickTo para un rendimiento superior al seguir el mouse
@@ -105,11 +150,40 @@ export const LandingPage = () => {
       posterEl.addEventListener("mouseleave", handleMouseLeave);
     }
 
+    // --- ACCORDION HOVER INTERACTIONS ---
+
+    const accordionItems = document.querySelectorAll(".accordion-item");
+
+    accordionItems.forEach((item: Element) => {
+      item.addEventListener("mouseenter", () => {
+        // Animar la sombra cyan al hacer hover
+        gsap.to(item, {
+          filter: "drop-shadow(0 0 30px rgba(34, 211, 238, 0.6))",
+          duration: 0.3,
+          ease: "power2.out"
+        });
+      });
+
+      item.addEventListener("mouseleave", () => {
+        // Revertir la sombra
+        gsap.to(item, {
+          filter: "drop-shadow(0 0 0px rgba(34, 211, 238, 0))",
+          duration: 0.3,
+          ease: "power2.out"
+        });
+      });
+    });
+
     return () => {
       if (posterEl) {
         posterEl.removeEventListener("mousemove", handleMouseMove);
         posterEl.removeEventListener("mouseleave", handleMouseLeave);
       }
+
+      accordionItems.forEach((item: Element) => {
+        item.removeEventListener("mouseenter", () => { });
+        item.removeEventListener("mouseleave", () => { });
+      });
     };
 
   }, { scope: containerRef }); // Muy importante encapsular para evitar errores de render
@@ -170,25 +244,67 @@ export const LandingPage = () => {
       </section>
 
       {/* 2. NOVEDADES SECTION */}
-      <section className="relative w-full py-24 border-t border-slate-800/30 z-10 bg-black/40 backdrop-blur-sm">
+      <section className="novedades-section relative w-full py-24 border-t border-slate-800/30 z-10 bg-black/40 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 w-full">
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-16 gap-6">
-            <div className="relative pb-2">
-              <h2 className="text-2xl sm:text-3xl font-black text-white uppercase tracking-tight">NOVEDADES</h2>
-              <div className="absolute bottom-0 left-0 w-16 h-1 bg-cyan-400" />
-            </div>
-
-            <Link to="/catalog" className="text-cyan-400 font-bold text-xs sm:text-sm tracking-[0.15em] uppercase hover:text-cyan-300 transition-colors">
-              VER TODO EL CATÁLOGO
-            </Link>
+          <div className="flex flex-col items-center justify-center mb-16 gap-6 text-center">
+            <span className="text-xs font-medium uppercase text-cyan-400 flex flex-wrap justify-center" style={{ gap: '0.35rem' }}>
+              {"Últimos cómics agregados".split(' ').map((word, wIdx) => (
+                <span key={wIdx} className="inline-flex overflow-hidden">
+                  {word.split('').map((char, cIdx) => (
+                    <span key={cIdx} className="novedades-char inline-block">{char}</span>
+                  ))}
+                </span>
+              ))}
+            </span>
+            <h2 className="novedades-heading text-3xl sm:text-5xl font-black leading-tight tracking-tight text-white">
+              Descubre las últimas <br />novedades en nuestro <span className="text-cyan-400">catálogo de cómics</span>
+            </h2>
           </div>
 
-          {/* Grid de Novedades */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {NOVEDADES.map(comic => (
-              <ComicCard key={comic.id} {...comic} />
-            ))}
+          {/* 3D Accordion Container */}
+          <div className="flex items-center justify-center w-full px-4">
+            <div className="flex w-3/4 max-w-5xl h-150 gap-3" style={{ perspective: '1200px' }}>
+              {!isLoading && accordionWorks.length > 0 ? (
+                accordionWorks.map((work) => (
+                  <div
+                    key={work.id}
+                    className="accordion-item group relative flex-1 min-w-0 h-full rounded-lg overflow-hidden cursor-pointer transition-all duration-300 ease-out hover:flex-2"
+                  >
+                    {/* Background Image - Visible base layer */}
+                    <div
+                      className="absolute inset-0 bg-cover bg-center transition-transform duration-300 group-hover:scale-110"
+                      style={{
+                        backgroundImage: `url('${work.coverUrl || FALLBACK_IMAGE}')`,
+                        filter: 'brightness(0.8)'
+                      }}
+                    />
+
+                    {/* Overlay Gradient */}
+                    <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-transparent" />
+
+                    {/* Content - Only visible on hover or expanded */}
+                    <div className="absolute inset-0 flex flex-col justify-end p-6 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <h3 className="text-lg font-bold mb-1 line-clamp-2">{work.title}</h3>
+                      <p className="text-sm text-cyan-300 font-medium">{work.author.name}</p>
+                    </div>
+
+                    {/* Border with glow effect */}
+                    <div className="absolute inset-0 border border-cyan-400/20 group-hover:border-cyan-400/60 rounded-lg transition-colors duration-300" />
+                  </div>
+                ))
+              ) : isLoading ? (
+                // Skeleton loading placeholders
+                <div className="flex w-full max-w-5xl h-150 gap-3">
+                  {[1, 2, 3].map((i) => (
+                    <div
+                      key={i}
+                      className="flex-1 min-w-0 h-full rounded-lg bg-slate-800/50 animate-pulse"
+                    />
+                  ))}
+                </div>
+              ) : null}
+            </div>
           </div>
 
         </div>
