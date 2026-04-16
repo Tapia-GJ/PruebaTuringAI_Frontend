@@ -25,3 +25,33 @@ export async function getWorkById(id: number): Promise<Work> {
   }
   return res.json();
 }
+
+export async function createWork(payload: Omit<Work, 'id' | 'createdAt' | 'updatedAt'>): Promise<Work> {
+  const res = await fetch(WORKS_BASE, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) throw new Error('Error al crear el cómic');
+  return res.json();
+}
+
+export async function updateWork(id: number, payload: Partial<Omit<Work, 'id' | 'createdAt' | 'updatedAt'>>): Promise<Work> {
+  const res = await fetch(`${WORKS_BASE}/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) throw new Error('Error al actualizar el cómic');
+  return res.json();
+}
+
+export async function deleteWork(id: number): Promise<void> {
+  const res = await fetch(`${WORKS_BASE}/${id}`, {
+    method: 'DELETE',
+    credentials: 'include'
+  });
+  if (!res.ok) throw new Error('Error al eliminar el cómic');
+}

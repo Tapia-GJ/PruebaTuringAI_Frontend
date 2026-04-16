@@ -6,7 +6,7 @@ const AUTH_BASE = `${API_BASE}/api/auth`;
 
 export async function fetchSession(): Promise<Session | null> {
   try {
-    const res = await fetch(`${AUTH_BASE}/session`, {
+    const res = await fetch(`${AUTH_BASE}/get-session`, {
       credentials: "include",
     });
     if (!res.ok) {
