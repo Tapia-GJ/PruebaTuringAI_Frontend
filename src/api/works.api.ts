@@ -26,7 +26,7 @@ export async function getWorkById(id: number): Promise<Work> {
   return res.json();
 }
 
-export async function createWork(payload: Omit<Work, 'id' | 'createdAt' | 'updatedAt'>): Promise<Work> {
+export async function createWork(payload: { title: string; description: string; coverUrl?: string; publishYear?: number; authorId: number; genreIds?: number[] }): Promise<Work> {
   const res = await fetch(WORKS_BASE, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -37,7 +37,7 @@ export async function createWork(payload: Omit<Work, 'id' | 'createdAt' | 'updat
   return res.json();
 }
 
-export async function updateWork(id: number, payload: Partial<Omit<Work, 'id' | 'createdAt' | 'updatedAt'>>): Promise<Work> {
+export async function updateWork(id: number, payload: Partial<{ title: string; description: string; coverUrl?: string; publishYear?: number; authorId: number; genreIds?: number[] }>): Promise<Work> {
   const res = await fetch(`${WORKS_BASE}/${id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },

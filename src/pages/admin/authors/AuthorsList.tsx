@@ -100,7 +100,7 @@ export const AuthorsList = () => {
         isOpen={isEditModalOpen}
         onClose={() => {
           setIsEditModalOpen(false);
-          setSelectedAuthor(null); // Limpiamos el autor seleccionado al cerrar
+          setSelectedAuthor(null);
         }}
         onSuccess={fetchAuthors}
         author={selectedAuthor}
