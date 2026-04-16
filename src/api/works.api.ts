@@ -13,6 +13,16 @@ export async function getWorks(): Promise<Work[]> {
   return res.json();
 }
 
+export async function getLatestWorks(): Promise<Work[]> {
+  const res = await fetch(`${WORKS_BASE}/latest`, {
+    credentials: 'include'
+  });
+  if (!res.ok) {
+    throw new Error('Error al cargar los últimos cómics');
+  }
+  return res.json();
+}
+
 export async function getWorkById(id: number): Promise<Work> {
   const res = await fetch(`${WORKS_BASE}/${id}`, {
     credentials: 'include'
